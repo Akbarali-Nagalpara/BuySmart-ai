@@ -21,6 +21,7 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = true)  // Allow null for Google OAuth users
     private String password;
 
     @CreationTimestamp

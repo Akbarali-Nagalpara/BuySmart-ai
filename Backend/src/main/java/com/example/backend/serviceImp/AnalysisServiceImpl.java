@@ -49,6 +49,11 @@ public class AnalysisServiceImpl implements AnalysisService {
         return analysisRepo.findTopByProduct_ProductIdOrderByAnalyzedAtDesc(productId)
                 .orElse(null);
     }
+    
+    @Override
+    public Optional<AnalysisResult> getLatestAnalysisForProduct(String productId) {
+        return analysisRepo.findTopByProduct_ProductIdOrderByAnalyzedAtDesc(productId);
+    }
 
     @Override
     public List<AnalysisResult> getAnalysisHistory(String productId) {

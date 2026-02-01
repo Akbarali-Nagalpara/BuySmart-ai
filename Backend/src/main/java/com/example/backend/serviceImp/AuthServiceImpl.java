@@ -41,5 +41,59 @@ public class AuthServiceImpl implements AuthService {
         return userRepository.save(user);
     }
 
+    @Override
+    public User findByEmail(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        return userOpt.orElse(null);
+    }
+
+    @Override
+    public User registerGoogleUser(User user) {
+        // Google OAuth users don't have a password
+        // Set password to null or a random value
+        user.setPassword(null);
+        user.setLastLogin(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
+    @Override
+    public boolean changePassword(String email, String currentPassword, String newPassword) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        
+        if (userOpt.isEmpty()) {
+            return false;
+        }
+        
+        User user = userOpt.get();
+        
+        // Check if user has a password (not OAuth user)
+        if (user.getPassword() == null) {
+            throw new RuntimeException("Cannot change password for OAuth users");
+        }
+        
+        // Verify current password
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;
+        }
+        
+        // Set new password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        
+        return true;
+    }
+
+    @Override
+    public void deleteAccount(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        
+        if (userOpt.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        
+        User user = userOpt.get();
+        userRepository.delete(user);
+    }
+
 }
 

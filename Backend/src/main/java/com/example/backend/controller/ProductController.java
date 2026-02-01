@@ -250,6 +250,63 @@ public class ProductController {
             log.info("🔍 Authentication object: {}", authentication != null ? "Present" : "NULL");
             log.info("🔍 Authorization header: {}", authHeader != null ? "Present (Bearer token)" : "NULL");
 
+            // 🔧 CHECK FOR CACHED ANALYSIS FIRST
+            log.info("🔍 Checking for existing analysis result for product: {}", productId);
+            Optional<AnalysisResult> cachedAnalysis = analysisService.getLatestAnalysisForProduct(productId);
+            
+            if (cachedAnalysis.isPresent()) {
+                AnalysisResult existingAnalysis = cachedAnalysis.get();
+                log.info("✅ Found cached analysis! Analysis ID: {}, Created: {}", 
+                    existingAnalysis.getId(), existingAnalysis.getAnalyzedAt());
+                
+                // Build response from cached analysis
+                Map<String, Object> response = new HashMap<>();
+                response.put("id", existingAnalysis.getId().toString());
+                response.put("productId", productId);
+                response.put("message", "Using cached analysis result");
+                response.put("overallScore", existingAnalysis.getTotalScore());
+                response.put("verdict", existingAnalysis.getVerdict());
+                response.put("cached", true);
+                
+                // Build structured data object from cached analysis
+                Map<String, Object> structuredData = new HashMap<>();
+                structuredData.put("overall_score", existingAnalysis.getTotalScore() / 100.0);
+                structuredData.put("decision", existingAnalysis.getVerdict());
+                structuredData.put("reason", existingAnalysis.getSummary());
+                
+                // Parse pros and cons from JSON strings
+                try {
+                    if (existingAnalysis.getPros() != null && !existingAnalysis.getPros().isEmpty()) {
+                        structuredData.put("pros", objectMapper.readValue(existingAnalysis.getPros(), List.class));
+                    }
+                    if (existingAnalysis.getCons() != null && !existingAnalysis.getCons().isEmpty()) {
+                        structuredData.put("cons", objectMapper.readValue(existingAnalysis.getCons(), List.class));
+                    }
+                    if (existingAnalysis.getKeyFeatures() != null && !existingAnalysis.getKeyFeatures().isEmpty()) {
+                        structuredData.put("key_features", objectMapper.readValue(existingAnalysis.getKeyFeatures(), Map.class));
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to parse cached JSON fields: {}", e.getMessage());
+                }
+                
+                // Add product details
+                Product product = existingAnalysis.getProduct();
+                if (product != null) {
+                    structuredData.put("title", product.getProductName());
+                    structuredData.put("brand", product.getBrand());
+                    structuredData.put("price", product.getLastPrice());
+                    structuredData.put("imageUrl", product.getImageUrl());
+                    structuredData.put("productLink", product.getProductLink());
+                }
+                
+                response.put("data", structuredData);
+                
+                log.info("✅ Returning cached analysis result (saved time and resources)");
+                return ResponseEntity.ok(response);
+            }
+            
+            log.info("⚠️ No cached analysis found. Proceeding with new analysis...");
+
             // 🔧 ENHANCED: Get current user with multiple methods
             User user = null;
             

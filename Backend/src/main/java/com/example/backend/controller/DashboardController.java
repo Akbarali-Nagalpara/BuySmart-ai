@@ -247,6 +247,49 @@ public class DashboardController {
         return ResponseEntity.ok(chartData);
     }
 
+    @GetMapping("/top-scored")
+    public ResponseEntity<List<Map<String, Object>>> getTopScoredProducts(
+            Authentication authentication,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        
+        User user = getUserFromAuthOrToken(authentication, authHeader);
+        
+        if (user == null) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        
+        // Get user-specific analyses and sort by score descending
+        List<AnalysisResult> topScoredAnalyses = analysisResultRepository.findByUserOrderByCreatedAtDesc(user)
+                .stream()
+                .sorted((a1, a2) -> Integer.compare(a2.getOverallScore(), a1.getOverallScore()))
+                .limit(3)
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> response = topScoredAnalyses.stream()
+                .map(analysis -> {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("id", analysis.getId().toString());
+                    item.put("productId", analysis.getProduct().getProductId());
+                    item.put("productName", analysis.getProduct().getProductName());
+                    item.put("brand", analysis.getProduct().getBrand());
+                    item.put("score", analysis.getOverallScore());
+                    item.put("verdict", analysis.getVerdict());
+                    item.put("price", analysis.getProduct().getLastPrice());
+                    
+                    // Add product image
+                    String imageUrl = analysis.getProduct().getImageUrl();
+                    if (imageUrl == null || imageUrl.isEmpty()) {
+                        imageUrl = "https://via.placeholder.com/400x400?text=No+Image";
+                    }
+                    item.put("imageUrl", imageUrl);
+                    
+                    return item;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(response);
+    }
+
     private User getUserFromAuthOrToken(Authentication authentication, String authHeader) {
         User user = null;
         

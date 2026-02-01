@@ -23,6 +23,9 @@ public interface AnalysisService {
 
     // Get latest analysis
     AnalysisResult getLatestAnalysis(String productId);
+    
+    // Get latest analysis as Optional
+    Optional<AnalysisResult> getLatestAnalysisForProduct(String productId);
 
     // Get full history
     List<AnalysisResult> getAnalysisHistory(String productId);

@@ -1,0 +1,84 @@
+MINIMALIST TOP SCORED PRODUCTS SECTION - REPLACEMENT CODE
+
+Replace lines 424-514 in Dashboard.tsx with this:
+
+```tsx
+              <div className="space-y-6">
+                {topScoredProducts.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="group flex flex-col md:flex-row gap-6 pb-6 border-b border-slate-200/60 dark:border-slate-800/60 last:border-0 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+                  >
+                    {/* Rank & Score */}
+                    <div className="flex md:flex-col items-center md:items-start gap-4 md:gap-2 md:w-20">
+                      <div className={`flex items-center justify-center w-10 h-10 rounded-lg text-sm font-bold ${
+                        index === 0
+                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
+                          : index === 1
+                          ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-700 dark:text-slate-400'
+                          : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                      }`}>
+                        #{index + 1}
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-slate-900 dark:text-white">
+                          {product.score}
+                        </div>
+                        <div className="text-xs text-slate-400">score</div>
+                      </div>
+                    </div>
+
+                    {/* Image */}
+                    <div className="flex items-center justify-center md:w-32 h-32 shrink-0">
+                      {product.imageUrl ? (
+                        <img
+                          src={product.imageUrl}
+                          alt={product.productName}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      ) : (
+                        <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600" />
+                      )}
+                    </div>
+
+                    {/* Product Details */}
+                    <div className="flex-1 min-w-0">
+                      {product.brand && (
+                        <div className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
+                          {product.brand}
+                        </div>
+                      )}
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 line-clamp-2">
+                        {product.productName}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-4 mt-3">
+                        {product.price && (
+                          <div className="text-xl font-bold text-slate-900 dark:text-white">
+                            ₹{product.price.toLocaleString()}
+                          </div>
+                        )}
+                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+                          product.verdict === 'BUY'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
+                        }`}>
+                          {product.verdict === 'BUY' ? (
+                            <TrendingUp className="w-3.5 h-3.5" />
+                          ) : (
+                            <TrendingDown className="w-3.5 h-3.5" />
+                          )}
+                          {product.verdict === 'BUY' ? 'Buy' : 'Skip'}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+```
+
+This is a clean, minimalist design with:
+- Simple border dividers (border-bottom) instead of heavy cards
+- No background colors or glassmorphism
+- Clean horizontal layout
+- Simple rank badges with subtle backgrounds
+- Reduced visual noise

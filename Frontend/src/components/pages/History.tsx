@@ -238,66 +238,51 @@ export function History() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {filteredAnalyses.map((analysis) => (
               <div
                 key={analysis.id}
-                className="group border border-slate-200 dark:border-slate-800 rounded-lg hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-lg transition-all bg-white dark:bg-slate-900 overflow-hidden"
+                className="group border border-slate-200 dark:border-slate-800 rounded-xl hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xl transition-all bg-white dark:bg-slate-900 overflow-hidden"
               >
                 {/* Image Container */}
-                <div className="relative aspect-square bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center p-4">
+                <div className="relative aspect-square bg-slate-50 dark:bg-slate-800/50 overflow-hidden flex items-center justify-center p-6">
                   <img
                     src={analysis.imageUrl}
                     alt={analysis.productName}
-                    className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                    className="max-w-full max-h-full object-contain group-hover:scale-110 transition-transform duration-500"
                   />
-                  
-                  {/* Score Badge */}
-                  <div className="absolute top-2 right-2 bg-white/95 dark:bg-slate-900/95 rounded-lg px-2 py-1 shadow-lg border border-slate-200/50 dark:border-slate-700/50">
-                    <div className={`text-base font-bold ${getScoreColor(analysis.score)}`}>
-                      {analysis.score}
-                    </div>
-                  </div>
-                  
-                  {/* Verdict Badge */}
-                  <div className="absolute top-2 left-2">
-                    <div
-                      className={`text-xs font-medium px-2 py-1 rounded ${
-                        analysis.verdict === 'BUY'
-                          ? 'bg-green-600 text-white'
-                          : 'bg-red-600 text-white'
-                      }`}
-                    >
-                      {analysis.verdict === 'BUY' ? 'BUY' : 'NOT BUY'}
-                    </div>
-                  </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-3">
+                <div className="p-4">
                   {/* Brand */}
-                  <p className="text-xs text-slate-400 dark:text-slate-600 mb-1">
+                  <p className="text-xs text-slate-400 dark:text-slate-500 mb-1.5 font-medium uppercase tracking-wide">
                     {analysis.brand}
                   </p>
 
                   {/* Product Name */}
-                  <h3 className="text-sm font-medium text-slate-900 dark:text-white mb-2 line-clamp-2 min-h-[2.5rem]">
+                  <h3 className="text-sm font-medium text-slate-900 dark:text-white mb-3 line-clamp-2 leading-snug min-h-[2.5rem]">
                     {analysis.productName}
                   </h3>
 
-                  {/* Date */}
-                  <div className="flex items-center gap-1 text-xs text-slate-400 dark:text-slate-600 mb-3">
-                    <Calendar className="w-3 h-3" />
-                    <span>
-                      {new Date(analysis.date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
+                  {/* Score and Date Row */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span>
+                        {new Date(analysis.date).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+                    <div className={`text-base font-bold ${getScoreColor(analysis.score)}`}>
+                      {analysis.score}
+                    </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <button
                       onClick={() => handleView(analysis.id)}
                       className="flex-1 flex items-center justify-center gap-1.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-3 py-2 rounded-lg text-xs font-medium transition-all hover:scale-[1.02]"

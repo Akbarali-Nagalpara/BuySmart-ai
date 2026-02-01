@@ -263,7 +263,7 @@ export function Wishlist() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {filteredWishlist.map((item) => {
               const priceDropPercent = item.originalPrice && item.originalPrice > item.currentPrice
                 ? Math.round(((item.originalPrice - item.currentPrice) / item.originalPrice) * 100)
@@ -272,125 +272,63 @@ export function Wishlist() {
               return (
                 <div
                   key={item.id}
-                  className="group bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden hover:border-slate-300 dark:hover:border-slate-600 transition-all"
+                  className="group bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-xl transition-all"
                 >
                   {/* Image Container */}
-                  <div className="relative aspect-square bg-slate-50 dark:bg-slate-900 overflow-hidden">
+                  <div className="relative aspect-square bg-slate-50 dark:bg-slate-800/50 overflow-hidden">
                     <img
                       src={item.imageUrl}
                       alt={item.productName}
-                      className="w-full h-full object-contain p-4"
+                      className="w-full h-full object-contain p-6 group-hover:scale-110 transition-transform duration-500"
                     />
                     
                     {/* Remove Button */}
                     <button
                       onClick={() => openDeleteModal(item.id, item.productName)}
                       disabled={deletingId === item.id}
-                      className="absolute top-2 right-2 p-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 transition-all group/btn disabled:opacity-50"
+                      className="absolute top-3 right-3 p-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-full hover:bg-red-50 dark:hover:bg-red-900/30 transition-all group/btn disabled:opacity-50 shadow-sm"
                     >
                       {deletingId === item.id ? (
-                        <Loader2 className="w-3.5 h-3.5 text-red-500 animate-spin" />
+                        <Loader2 className="w-4 h-4 text-red-500 animate-spin" />
                       ) : (
-                        <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
+                        <Heart className="w-4 h-4 text-red-500 fill-red-500" />
                       )}
                     </button>
-
-                    {/* Score Badge */}
-                    {item.score && (
-                      <div className="absolute top-2 left-2">
-                        <div className="bg-white dark:bg-slate-800 rounded-lg px-2 py-1.5 backdrop-blur-sm border border-slate-200 dark:border-slate-700">
-                          <div className="text-center">
-                            <div className={`text-lg font-bold ${getScoreColor(item.score)}`}>
-                              {item.score}
-                            </div>
-                            <div className="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-medium">
-                              Score
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Price Drop Badge */}
-                    {priceDropPercent > 0 && (
-                      <div className="absolute bottom-2 left-2">
-                        <div className="bg-green-500 text-white px-2 py-1 rounded text-[10px] font-semibold">
-                          {priceDropPercent}% OFF
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Verdict Badge */}
-                    {item.verdict && (
-                      <div className="absolute bottom-2 right-2">
-                        <div
-                          className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold backdrop-blur-sm ${
-                            item.verdict === 'BUY'
-                              ? 'bg-green-500/90 text-white'
-                              : 'bg-red-500/90 text-white'
-                          }`}
-                        >
-                          {item.verdict === 'BUY' ? (
-                            <CheckCircle className="w-3 h-3" />
-                          ) : (
-                            <XCircle className="w-3 h-3" />
-                          )}
-                          {item.verdict === 'BUY' ? 'Buy' : 'Pass'}
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Content */}
                   <div className="p-3">
                     {/* Brand */}
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mb-1.5 font-medium uppercase tracking-wide">
                       {item.brand}
                     </p>
 
                     {/* Product Name */}
-                    <h3 className="text-sm font-medium text-slate-900 dark:text-white mb-2 line-clamp-2 leading-tight min-h-[2.5rem]">
+                    <h3 className="text-sm font-medium text-slate-900 dark:text-white mb-3 line-clamp-2 leading-snug min-h-[2.5rem]">
                       {item.productName}
                     </h3>
 
-                    {/* Price Section */}
-                    <div className="mb-3">
-                      <div className="flex items-baseline justify-between">
-                        <div>
-                          <div className="text-lg font-bold text-slate-900 dark:text-white">
-                            ₹{item.currentPrice.toLocaleString()}
-                          </div>
-                          {item.originalPrice && item.originalPrice > item.currentPrice && (
-                            <div className="text-xs text-slate-500 dark:text-slate-400 line-through">
-                              ₹{item.originalPrice.toLocaleString()}
-                            </div>
-                          )}
+                    {/* Price and Score Row */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <div className="text-lg font-bold text-slate-900 dark:text-white">
+                          ₹{item.currentPrice.toLocaleString()}
                         </div>
-                        {item.rating > 0 && (
-                          <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/20 px-1.5 py-0.5 rounded">
-                            <span className="text-yellow-500 text-xs">★</span>
-                            <span className="font-semibold text-xs text-slate-900 dark:text-white">
-                              {item.rating.toFixed(1)}
-                            </span>
+                        {item.originalPrice && item.originalPrice > item.currentPrice && (
+                          <div className="text-xs text-slate-400 dark:text-slate-500 line-through">
+                            ₹{item.originalPrice.toLocaleString()}
                           </div>
                         )}
                       </div>
+                      {item.score && (
+                        <div className={`text-base font-bold ${getScoreColor(item.score)}`}>
+                          {item.score}
+                        </div>
+                      )}
                     </div>
 
-                    {/* Score Bar */}
-                    {item.score && (
-                      <div className="mb-3">
-                        <div className="bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className={`bg-gradient-to-r ${getScoreGradient(item.score)} h-full transition-all duration-500`}
-                            style={{ width: `${item.score}%` }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
                     {/* Actions */}
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                       <button
                         onClick={() => viewAnalysis(item)}
                         className="flex-1 flex items-center justify-center gap-1.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 px-3 py-2 rounded-lg text-xs font-medium transition-all"

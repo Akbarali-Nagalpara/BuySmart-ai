@@ -70,4 +70,85 @@ public class AuthController {
         );
     }
 
+    @PostMapping("/google")
+    public ResponseEntity<?> googleAuth(@RequestBody Map<String, String> request) {
+        try {
+            String email = request.get("email");
+            String name = request.get("name");
+            String googleId = request.get("googleId");
+
+            // Check if user already exists
+            User existingUser = authService.findByEmail(email);
+            
+            User user;
+            if (existingUser != null) {
+                // User exists, just login
+                user = existingUser;
+            } else {
+                // Create new user without password (Google OAuth user)
+                User newUser = new User();
+                newUser.setEmail(email);
+                newUser.setName(name);
+                newUser.setPassword(null); // No password for OAuth users
+                user = authService.registerGoogleUser(newUser);
+            }
+
+            // Generate JWT token
+            String token = jwtTokenUtil.generateToken(user.getEmail());
+
+            // Return response matching frontend expectations
+            return ResponseEntity.ok(
+                    Map.of(
+                            "token", token,
+                            "user", Map.of(
+                                    "id", user.getId().toString(),
+                                    "email", user.getEmail(),
+                                    "name", user.getName()
+                            )
+                    )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to authenticate with Google: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> request, 
+                                           @RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtTokenUtil.getEmailFromToken(token);
+            String currentPassword = request.get("currentPassword");
+            String newPassword = request.get("newPassword");
+
+            boolean changed = authService.changePassword(email, currentPassword, newPassword);
+            
+            if (changed) {
+                return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", "Current password is incorrect"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to change password: " + e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/delete-account")
+    public ResponseEntity<?> deleteAccount(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String token = authHeader.replace("Bearer ", "");
+            String email = jwtTokenUtil.getEmailFromToken(token);
+
+            authService.deleteAccount(email);
+            
+            return ResponseEntity.ok(Map.of("message", "Account deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to delete account: " + e.getMessage()));
+        }
+    }
+
 }
