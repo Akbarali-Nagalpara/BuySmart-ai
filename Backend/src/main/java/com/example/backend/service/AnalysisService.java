@@ -1,9 +1,6 @@
 package com.example.backend.service;
 
 
-
-
-
 import com.example.backend.entity.AnalysisResult;
 import com.example.backend.entity.Product;
 
